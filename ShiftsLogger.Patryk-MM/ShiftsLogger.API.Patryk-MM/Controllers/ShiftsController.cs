@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using ShiftsLogger.API.Patryk_MM.Models;
 using ShiftsLogger.API.Patryk_MM.Services;
-using System.Threading.Tasks;
+using ShiftsLogger.API.Patryk_MM.Shared;
 
 namespace ShiftsLogger.API.Patryk_MM.Controllers;
 
@@ -18,15 +19,30 @@ public class ShiftsController : ControllerBase {
 
     [HttpGet()]
     public async Task<IActionResult> GetShifts() {
-        List<Shift> shifts = await _service.GetAllShifts();
+        var result = await _service.GetAllShifts();
 
-        return Ok(shifts);
+        if (!result.IsSuccess) {
+            return BadRequest(result.Error);
+        }
+        return Ok(result);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetShiftByID(Guid id) {
+        var result = await _service.GetShiftById(id);
+
+        if (!result.IsSuccess) return NotFound(result.Error);
+        return Ok(result);
     }
 
     [HttpPost()]
     public async Task<IActionResult> CreateShift(DateTime start, DateTime end) {
-        ServiceResponse<Shift> response = await _service.CreateShift(start, end);
+        var result = await _service.CreateShift(start, end);
 
-        return StatusCode((int)response.ResponseCode, response.Data);
+        if (!result.IsSuccess) {
+            return BadRequest(result.Error);
+        }
+
+        return CreatedAtAction(nameof(GetShiftByID), new { result.Data?.Id }, result);
     }
 }

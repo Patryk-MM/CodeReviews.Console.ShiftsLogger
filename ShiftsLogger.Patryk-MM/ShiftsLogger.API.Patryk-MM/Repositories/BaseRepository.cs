@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using ShiftsLogger.API.Patryk_MM.Models;
 using System.Linq.Expressions;
 
