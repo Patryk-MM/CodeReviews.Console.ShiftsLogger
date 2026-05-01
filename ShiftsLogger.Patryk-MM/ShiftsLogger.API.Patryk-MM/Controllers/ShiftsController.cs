@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using ShiftsLogger.API.Patryk_MM.DTOs;
 using ShiftsLogger.API.Patryk_MM.Models;
 using ShiftsLogger.API.Patryk_MM.Services;
 using ShiftsLogger.API.Patryk_MM.Shared;
@@ -17,9 +17,23 @@ public class ShiftsController : ControllerBase {
         _logger = logger;
     }
 
+    //[HttpGet()]
+    //[ProducesResponseType(typeof(Result<IEnumerable<ShiftDTO>>), StatusCodes.Status200OK)]
+    //[ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    //public async Task<IActionResult> GetShifts() {
+    //    var result = await _service.GetAllShifts();
+
+    //    if (!result.IsSuccess) {
+    //        return BadRequest(result.Error);
+    //    }
+    //    return Ok(result);
+    //}
+
     [HttpGet()]
-    public async Task<IActionResult> GetShifts() {
-        var result = await _service.GetAllShifts();
+    [ProducesResponseType(typeof(PaginatedResult<IEnumerable<ShiftDTO>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetPaginatedShifts(int pageNumber, int pageSize) {
+        var result = await _service.GetPaginatedShifts(pageNumber, pageSize);
 
         if (!result.IsSuccess) {
             return BadRequest(result.Error);
@@ -28,21 +42,32 @@ public class ShiftsController : ControllerBase {
     }
 
     [HttpGet("{id}")]
+    [ProducesResponseType(typeof(Result<ShiftDTO>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetShiftByID(Guid id) {
         var result = await _service.GetShiftById(id);
 
-        if (!result.IsSuccess) return NotFound(result.Error);
+        if (!result.IsSuccess) {
+            return NotFound(result.Error);
+        }
         return Ok(result);
     }
 
     [HttpPost()]
-    public async Task<IActionResult> CreateShift(DateTime start, DateTime end) {
-        var result = await _service.CreateShift(start, end);
+    [ProducesResponseType(typeof(Result<Shift>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(Error), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateShift(CreateShiftDTO dto) {
+        var result = await _service.CreateShift(dto);
 
         if (!result.IsSuccess) {
             return BadRequest(result.Error);
         }
 
         return CreatedAtAction(nameof(GetShiftByID), new { result.Data?.Id }, result);
+    }
+
+    [HttpDelete()]
+    public async Task<IActionResult> DeleteShift(Guid id) {
+        throw new NotImplementedException();
     }
 }

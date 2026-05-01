@@ -1,7 +1,9 @@
-﻿using ShiftsLogger.API.Patryk_MM.Models;
+﻿using ShiftsLogger.API.Patryk_MM.DTOs;
+using ShiftsLogger.API.Patryk_MM.Mappers;
+using ShiftsLogger.API.Patryk_MM.Models;
 using ShiftsLogger.API.Patryk_MM.Repositories;
 using ShiftsLogger.API.Patryk_MM.Shared;
-using System.Net;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace ShiftsLogger.API.Patryk_MM.Services;
 
@@ -13,32 +15,48 @@ public class ShiftService {
         _repository = repository;
     }
 
-    public async Task<Result<IEnumerable<Shift>>> GetAllShifts() {
+    public async Task<Result<IEnumerable<ShiftDTO>>> GetAllShifts() {
         IEnumerable<Shift> shifts = await _repository.GetAllAsync();
-        return Result.Success(shifts);
+
+        IEnumerable<ShiftDTO> dtos = shifts.Select(s => s.ToDTO());
+
+        return Result.Success(dtos);
     }
 
-    public async Task<Result<Shift>> GetShiftById(Guid id) {
-        Shift shift = await _repository.GetByIdAsync(id);
+    public async Task<Result<IEnumerable<ShiftDTO>>> GetPaginatedShifts(int pageNumber, int pageSize) {
+        IEnumerable<Shift> shifts = await _repository.GetPaginatedShifstAsync(pageNumber, pageSize);
 
-        if (shift is null) return Result.Failure<Shift>($"Shift with Id {id} was not found.");
+        IEnumerable<ShiftDTO> dtos = shifts.Select(s => s.ToDTO());
 
-        return Result.Success(shift);
+        return Result.Success(dtos, pageNumber, pageSize);
     }
 
-    public async Task<Result<Shift>> CreateShift(DateTime start, DateTime end) {
-        if (start > end) {
+    public async Task<Result<ShiftDTO>> GetShiftById(Guid id) {
+        Shift? shift = await _repository.GetByIdAsync(id);
+
+        if (shift is null) {
+            return Result.Failure<ShiftDTO>($"Shift with Id {id} was not found.");
+        }
+
+        var dto = shift.ToDTO();
+
+        return Result.Success(dto);
+    }
+
+    public async Task<Result<Shift>> CreateShift(CreateShiftDTO dto) {
+        if (dto.Start > dto.End) {
             return Result.Failure<Shift>("End time cannot be before start time.");
         }
 
         Shift shift = new Shift {
             Id = Guid.NewGuid(),
-            Start = start,
-            End = end,
+            Start = dto.Start,
+            End = dto.End,
         };
 
         await _repository.AddAsync(shift);
         return Result.Success(shift);
-
     }
+
+
 }

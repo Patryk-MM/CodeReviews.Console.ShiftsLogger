@@ -13,6 +13,7 @@ public class Result {
     public static Result Failure(Error error) => new(false, error);
     public static Result<T> Success<T>(T data) => new(true, Error.None, data);
     public static Result<T> Failure<T>(Error error) => new(false, error, default);
+    public static PaginatedResult<T> Success<T>(T data, int pageNumber, int pageSize) => new(true, Error.None, data, pageNumber, pageSize);
 }
 
 public class Result<T> : Result {
@@ -20,5 +21,15 @@ public class Result<T> : Result {
 
     public Result(bool isSuccess, Error error, T? data) : base(isSuccess, error) {
         Data = data;
+    }
+}
+
+public class PaginatedResult<T> : Result<T> {
+    public int PageNumber { get; set; }
+    public int PageSize { get; set; }
+
+    public PaginatedResult(bool isSuccess, Error error, T? data, int pageNumber, int pageSize) : base(isSuccess, error, data) {
+        PageSize = pageSize;
+        PageNumber = pageNumber;
     }
 }

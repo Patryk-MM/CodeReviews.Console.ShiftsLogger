@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Net;
 
 namespace ShiftsLogger.API.Patryk_MM.Middleware;
 
@@ -27,6 +28,6 @@ public class LoggingMiddleware {
 
         int statusCode = context.Response.StatusCode;
 
-        _logger.LogInformation($"OUTGOING [{traceId}]: {method} {path} | Status: {statusCode} | Elapsed: {stopwatch.ElapsedMilliseconds} ms");
+        _logger.LogInformation($"OUTGOING [{traceId}]: {method} {path} | Status: {statusCode} {(HttpStatusCode)statusCode} | Elapsed: {stopwatch.ElapsedMilliseconds} ms");
     }
 }

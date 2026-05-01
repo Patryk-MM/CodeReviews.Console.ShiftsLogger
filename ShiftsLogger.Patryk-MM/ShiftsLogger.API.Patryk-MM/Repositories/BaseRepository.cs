@@ -6,8 +6,8 @@ namespace ShiftsLogger.API.Patryk_MM.Repositories;
 
 public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity {
 
-    private readonly AppDbContext _context;
-    private readonly DbSet<T> _dbSet;
+    protected readonly AppDbContext _context;
+    protected readonly DbSet<T> _dbSet;
 
     public BaseRepository(AppDbContext context) {
         _context = context;
@@ -29,11 +29,11 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity {
         await _context.SaveChangesAsync();
     }
 
-    public async Task<List<T>> GetAllAsync() {
+    public async Task<IEnumerable<T>> GetAllAsync() {
         return await _dbSet.ToListAsync();
     }
 
-    public async Task<List<T>> GetAsync(Expression<Func<T, bool>> predicate) {
+    public async Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> predicate) {
         return await _dbSet.Where(predicate).ToListAsync();
     }
 
