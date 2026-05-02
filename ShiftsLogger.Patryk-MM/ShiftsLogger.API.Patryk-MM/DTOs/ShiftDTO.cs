@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace ShiftsLogger.API.Patryk_MM.DTOs;
 
@@ -12,4 +12,9 @@ public class ShiftDTO {
 public class CreateShiftDTO {
     public DateTime Start { get; set; }
     public DateTime? End { get; set; }
+}
+
+public class UpdateShiftDTO {
+	public DateTime Start { get; set; }
+	public DateTime? End { get; set; }
 }

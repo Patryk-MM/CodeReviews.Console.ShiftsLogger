@@ -1,10 +1,10 @@
-﻿namespace ShiftsLogger.API.Patryk_MM.Shared;
+namespace ShiftsLogger.API.Patryk_MM.Shared;
 
 public class Result {
     public bool IsSuccess { get; }
     public Error Error { get; set; }
 
-    public Result(bool isSuccess, Error error) {
+    protected Result(bool isSuccess, Error error) {
         IsSuccess = isSuccess;
         Error = error;
     }
